@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "129855789266",
+    "firebase_url": "https://video-conference-af8d5.firebaseio.com",
+    "project_id": "video-conference-af8d5",
+    "storage_bucket": "video-conference-af8d5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:129855789266:android:2bf5b206382605c284f50b",
+        "android_client_info": {
+          "package_name": "com.app.conference"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "129855789266-p23ivib7tpi0t10o668m8c7aj8ehm19n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.conference",
+            "certificate_hash": "07237c77fc574d976ae74880605a09b4423eace7"
+          }
+        },
+        {
+          "client_id": "129855789266-i47lta6btk4r0bjd7ol37770on19dvma.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEHWO6Tl01itVffKcwidua8-CoMXFZ3v0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "129855789266-i47lta6btk4r0bjd7ol37770on19dvma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

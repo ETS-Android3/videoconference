@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.SettingsActivity">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/L2Text"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/label_title_resolution"
+            android:textColor="#FF333333" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/settings_video_resolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="12dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/L2Text"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:gravity="start|center_vertical"
+            android:text="@string/label_title_frame_rate"
+            android:textColor="#FF333333" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="20" />
+
+        <Spinner
+            android:id="@+id/settings_video_frame_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_weight=".7">
+
+            <TextView
+                android:id="@+id/tv_device_name"
+                style="@style/L2Text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text=""
+                android:textColor="#FF333333" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_weight=".3">
+
+            <ImageView
+                android:id="@+id/img_edit"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="@dimen/dimen_5dp"
+                android:background="@drawable/edit"
+                 />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <TextView
+        style="@style/L2Text"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:paddingStart="16dp"
+        android:background="@color/white"
+        android:paddingEnd="16dp"
+        android:gravity="start|center_vertical"
+        android:text="Pick up settings"
+        android:textColor="#FF333333" />
+
+
+    <RadioGroup
+        android:id="@+id/gridRadioPickup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="@dimen/dimen_10dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" >
+
+        <RadioButton
+            android:id="@+id/gridRadioAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/radio_selector"
+            android:padding="@dimen/dimen_10dp"
+            android:text="@string/auto" />
+
+        <RadioButton
+            android:id="@+id/gridRadioRing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/radio_selector"
+            android:padding="@dimen/dimen_10dp"
+            android:text="@string/manual" />
+
+
+    </RadioGroup>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+
+    <TextView
+        style="@style/L2Text"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:paddingStart="16dp"
+        android:background="@color/white"
+        android:paddingEnd="16dp"
+        android:gravity="start|center_vertical"
+        android:text="Settings for Grid View"
+        android:textColor="#FF333333" />
+
+
+    <RadioGroup
+        android:id="@+id/gridRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="@dimen/dimen_10dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" >
+
+        <RadioButton
+            android:id="@+id/gridRadioButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/radio_selector"
+            android:padding="@dimen/dimen_10dp"
+            android:text="3X2" />
+
+        <RadioButton
+            android:id="@+id/gridRadioButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/radio_selector"
+            android:padding="@dimen/dimen_10dp"
+            android:text="4X2" />
+
+
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <TextView
+        android:id="@+id/tvLogout"
+        style="@style/L2Text"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:paddingStart="16dp"
+        android:background="@color/white"
+        android:paddingEnd="16dp"
+        android:gravity="start|center_vertical"
+        android:text="@string/logout"
+        android:textColor="#FF333333" />
+
+</LinearLayout>

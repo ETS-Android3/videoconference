@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources>
+    <string name="app_name">B.U.D.</string>
+
+    <string name="default_notification_channel_id">General</string>
+    <string name="default_notification_channel_name" translatable="true">Weather</string>
+
+    <string name="connect_to_video_conference">Connect to B.U.D. Video Conferencing System</string>
+
+    <string name="label_settings">Settings</string>
+
+    <string name="msg_welcome_message">Welcome to Open Video Call</string>
+
+    <string name="label_channel_name_hint">Channel name</string>
+
+    <string name="label_encryption_key_hint">Encryption key</string>
+
+    <string name="label_join">Join</string>
+
+    <string name="label_do_network_test">Test your network</string>
+
+    <string name="label_confirm">Confirm</string>
+
+    <string name="label_send">Send</string>
+
+    <string name="label_options">Options</string>
+    <string name="label_network_testing">Testing…</string>
+    <string name="label_network_testing_placeholder">-</string>
+    <string name="label_network_test_result">Test Result</string>
+
+    <string name="label_debug">Debug</string>
+    <string name="label_quality">Quality</string>
+    <string name="label_rtt">RTT</string>
+    <string name="label_uplink_packet_loss">Uplink Packet Loss</string>
+    <string name="label_downlink_packet_loss">Downlink Packet Loss</string>
+
+    <string name="msg_say_something">Say something…</string>
+
+    <string name="msg_connection_error">Connection error, please check the network settings or make sure channel name/access token are valid</string>
+
+    <string name="label_title_resolution">Resolution</string>
+    <string name="label_title_frame_rate">Frame Rate (fps)</string>
+
+    // DO NOT TRANSLATE
+    <string name="bit_rate_value_with_unit">%d kbps</string>
+    <string name="frame_rate_value_with_unit">%d fps</string>
+
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="speech_recognizer_not_available">Speech Recognizer not available</string>
+    <string name="tts_not_available">There is no TTS Engine on your device</string>
+    <string name="connect">Connect</string>
+    <string name="connect_all_device">Please connect to a room below</string>
+    <string name="invite_device_for_conferencing">Please invite a device to join the B.U.D. Video Conferencing System</string>
+    <string name="all_room">All Rooms</string>
+    <string name="activate">Activate</string>
+    <string name="enter_code">Enter Code</string>
+    <string name="user_id">User Id</string>
+    <string name="password">Password</string>
+    <string name="device_login">Device Login</string>
+    <string name="please_wait">Please wait&#8230;</string>
+    <string name="alert">Alert</string>
+    <string name="session_expired">Session expired!\n\nPlease login again</string>
+    <string name="some_error">Some error occurred!</string>
+    <string name="invalid_userid_password">Invalid UserId or Password</string>
+    <string name="userid_required">UserId required!</string>
+    <string name="password_required">Password required!</string>
+    <string name="code_required">Activation Code required!</string>
+    <string name="field_cannot_be_empty_please_fill">Field cannot be empty, Please Fill.</string>
+    <string name="logout">Logout</string>
+
+    <!-- Wake Word -->
+    <string name="wake_word">hello bedroom</string>
+    <string name="switch_room">Switch Room</string>
+    <string name="vca">B.U.D.</string>
+    <string name="video_calling_app">B.U.D. Video Conferencing System</string>
+    <string name="video_conferencing_system">Video Conferencing System</string>
+    <string name="get_started">Get Started</string>
+    <string name="no_participants_hint">You are the only percipient in this roomRequest, \n Please wait others to join.</string>
+    <string name="active">active</string>
+    <string name="allow">Allow</string>
+    <string name="dont_allow">Don\'t Allow</string>
+    <string name="request_sent_successfully">Request sent successfully.</string>
+    <string name="invite_sent_successfully">Invite sent successfully.</string>
+    <string name="invite_accept_successfully">Invite accept successfully.</string>
+    <string name="invite_cancel_successfully">Invite cancel successfully.</string>
+    <string name="action_performed_successfully">Action performed successfully.</string>
+    <string name="invite_device">Invite Device</string>
+    <string name="switch_device">Switch Device</string>
+    <string name="all_devices">All Devices</string>
+    <string name="notification">notification</string>
+    <string name="video_conference">B.U.D. Video Conferencing System</string>
+    <string name="please_enter_activation_code_here">Please enter activation code here</string>
+    <string name="please_select_device_first">Please select device first.</string>
+    <string name="close">Close</string>
+    <string name="apply">Apply</string>
+    <string name="enter_your_device_name">Enter your new device name</string>
+    <string name="auto">Auto</string>
+    <string name="manual">Manual</string>
+
+</resources>

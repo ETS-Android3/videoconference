@@ -1,0 +1,422 @@
+package io.agora.openvcall.ui;
+
+import android.Manifest;
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
+import android.graphics.Typeface;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.kinda.alert.KAlertDialog;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+
+import io.agora.openvcall.AGApplication;
+import io.agora.openvcall.BuildConfig;
+import io.agora.openvcall.R;
+import io.agora.openvcall.model.ConstantApp;
+import io.agora.openvcall.model.CurrentUserSettings;
+import io.agora.openvcall.model.EngineConfig;
+import io.agora.openvcall.model.MyEngineEventHandler;
+import io.agora.openvcall.model.WorkerThread;
+import io.agora.propeller.Constant;
+import io.agora.rtc.RtcEngine;
+import io.agora.util.CustomProgressDialog;
+import io.agora.util.ManageSession;
+import io.socket.client.Socket;
+
+public abstract class BaseActivity extends AppCompatActivity {
+    private final static Logger log = LoggerFactory.getLogger(BaseActivity.class);
+
+    public CustomProgressDialog mProgressDialog;
+    public String IMEI = "";
+    Socket mSocket;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        AGApplication instance = (AGApplication) getApplication();
+        mSocket = instance.getSocketInstance();
+        mSocket.connect();
+
+        final View layout = findViewById(Window.ID_ANDROID_CONTENT);
+        ViewTreeObserver vto = layout.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+                initUIandEvent();
+            }
+        });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                if (tm != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                       // IMEI = tm.getImei();
+                        IMEI = Settings.Secure.getString(getContentResolver(),Settings.Secure.ANDROID_ID);
+
+                    }
+                    else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+                        IMEI = tm.getImei();
+                    }
+                    else {
+                        IMEI = tm.getDeviceId();
+                    }
+                }
+            }
+        }
+
+
+
+    }
+
+
+
+    protected abstract void initUIandEvent();
+
+    protected abstract void deInitUIandEvent();
+
+    protected void workerThreadReady() {
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isFinishing()) {
+                    return;
+                }
+
+                boolean checkPermissionResult = checkSelfPermissions();
+
+                if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
+                    // so far we do not use OnRequestPermissionsResultCallback
+                }
+            }
+        }, 500);
+    }
+
+    private boolean checkSelfPermissions() {
+        return checkSelfPermission(Manifest.permission.RECORD_AUDIO, ConstantApp.PERMISSION_REQ_ID_RECORD_AUDIO) &&
+                checkSelfPermission(Manifest.permission.CAMERA, ConstantApp.PERMISSION_REQ_ID_CAMERA) &&
+                checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, ConstantApp.PERMISSION_REQ_ID_WRITE_EXTERNAL_STORAGE) &&
+                checkSelfPermission(Manifest.permission.READ_PHONE_STATE, ConstantApp.PERMISSION_REQ_ID_READ_PHONE_STATE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        deInitUIandEvent();
+        super.onDestroy();
+    }
+
+    public final void closeIME(View v) {
+        InputMethodManager mgr = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(v.getWindowToken(), 0); // 0 force close IME
+        v.clearFocus();
+    }
+
+    public final void closeIMEWithoutFocus(View v) {
+        InputMethodManager mgr = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(v.getWindowToken(), 0); // 0 force close IME
+    }
+
+    public void openIME(final EditText v) {
+        final boolean focus = v.requestFocus();
+        if (v.hasFocus()) {
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager mgr = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    boolean result = mgr.showSoftInput(v, InputMethodManager.SHOW_FORCED);
+                    log.debug("openIME " + focus + " " + result);
+                }
+            });
+        }
+    }
+
+    public boolean checkSelfPermission(String permission, int requestCode) {
+        log.debug("checkSelfPermission " + permission + " " + requestCode);
+        if (ContextCompat.checkSelfPermission(this,
+                permission)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{permission},
+                    requestCode);
+            return false;
+        }
+
+        if (Manifest.permission.CAMERA.equals(permission)) {
+            ((AGApplication) getApplication()).initWorkerThread();
+            workerThreadReady();
+        }
+        return true;
+    }
+
+    protected RtcEngine rtcEngine() {
+        return ((AGApplication) getApplication()).getWorkerThread().getRtcEngine();
+    }
+
+    protected final WorkerThread worker() {
+        return ((AGApplication) getApplication()).getWorkerThread();
+    }
+
+    protected final EngineConfig config() {
+        return ((AGApplication) getApplication()).getWorkerThread().getEngineConfig();
+    }
+
+    protected final MyEngineEventHandler event() {
+        return ((AGApplication) getApplication()).getWorkerThread().eventHandler();
+    }
+
+    public final void showLongToast(final String msg) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        log.debug("onRequestPermissionsResult " + requestCode + " " + Arrays.toString(permissions) + " " + Arrays.toString(grantResults));
+        switch (requestCode) {
+            case ConstantApp.PERMISSION_REQ_ID_RECORD_AUDIO: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkSelfPermission(Manifest.permission.CAMERA, ConstantApp.PERMISSION_REQ_ID_CAMERA);
+                } else {
+                    finish();
+                }
+                break;
+            }
+            case ConstantApp.PERMISSION_REQ_ID_CAMERA: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, ConstantApp.PERMISSION_REQ_ID_WRITE_EXTERNAL_STORAGE);
+                    ((AGApplication) getApplication()).initWorkerThread();
+                    workerThreadReady();
+                } else {
+                    finish();
+                }
+                break;
+            }
+            case ConstantApp.PERMISSION_REQ_ID_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkSelfPermission(Manifest.permission.READ_PHONE_STATE, ConstantApp.PERMISSION_REQ_ID_READ_PHONE_STATE);
+                } else {
+                    finish();
+                }
+                break;
+            }
+
+            case ConstantApp.PERMISSION_REQ_ID_READ_PHONE_STATE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                    if (tm != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            IMEI = tm.getImei();
+                        } else {
+                            IMEI = tm.getDeviceId();
+                        }
+                    }
+                    ManageSession.setPreference(this, ManageSession.IMEI, IMEI);
+                } else {
+                    finish();
+                }
+                break;
+            }
+        }
+    }
+
+    protected CurrentUserSettings vSettings() {
+        return AGApplication.mVideoSettings;
+    }
+
+    protected int virtualKeyHeight() {
+        boolean hasPermanentMenuKey = ViewConfiguration.get(getApplication()).hasPermanentMenuKey();
+        if (hasPermanentMenuKey) {
+            return 0;
+        }
+
+        // Also can use getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        DisplayMetrics metrics = new DisplayMetrics();
+        Display display = getWindowManager().getDefaultDisplay();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            display.getRealMetrics(metrics);
+        } else {
+            display.getMetrics(metrics);
+        }
+
+        int fullHeight = metrics.heightPixels;
+        int fullWidth = metrics.widthPixels;
+
+        if (fullHeight < fullWidth) {
+            fullHeight ^= fullWidth;
+            fullWidth ^= fullHeight;
+            fullHeight ^= fullWidth;
+        }
+
+        display.getMetrics(metrics);
+
+        int newFullHeight = metrics.heightPixels;
+        int newFullWidth = metrics.widthPixels;
+
+        if (newFullHeight < newFullWidth) {
+            newFullHeight ^= newFullWidth;
+            newFullWidth ^= newFullHeight;
+            newFullHeight ^= newFullWidth;
+        }
+
+        int virtualKeyHeight = fullHeight - newFullHeight;
+
+        if (virtualKeyHeight > 0) {
+            return virtualKeyHeight;
+        }
+
+        virtualKeyHeight = fullWidth - newFullWidth;
+
+        return virtualKeyHeight;
+    }
+
+    protected final int getStatusBarHeight() {
+        // status bar height
+        int statusBarHeight = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+        }
+
+        if (statusBarHeight == 0) {
+            log.error("Can not get height of status bar");
+        }
+
+        return statusBarHeight;
+    }
+
+    protected final int getActionBarHeight() {
+        // action bar height
+        int actionBarHeight = 0;
+        final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
+                new int[]{android.R.attr.actionBarSize}
+        );
+        actionBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+
+        if (actionBarHeight == 0) {
+            log.error("Can not get height of action bar");
+        }
+
+        return actionBarHeight;
+    }
+
+    protected void initVersionInfo() {
+        String version = "V " + BuildConfig.VERSION_NAME + "(Build: " + BuildConfig.VERSION_CODE
+                + ", " + ConstantApp.APP_BUILD_DATE + ", SDK: " + Constant.MEDIA_SDK_VERSION + ")";
+//        TextView textVersion = (TextView) findViewById(R.id.app_version);
+//        textVersion.setText(version);
+    }
+
+    public void showSnackBar(View view, String message) {
+        Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
+        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+        View snackbarView = snackbar.getView();
+        TextView snackTextView = (TextView) snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        snackTextView.setTextSize(13);
+        snackTextView.setMaxLines(3);
+        snackbar.show();
+    }
+
+    public void showProgress() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new CustomProgressDialog(this);
+        }
+        if (!mProgressDialog.isShowing())
+            mProgressDialog.show();
+    }
+
+    public void dismissProgress() {
+        if (mProgressDialog != null) {
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            mProgressDialog = null;
+        }
+    }
+
+
+    public void showUnauthorisedAlert(Context context) {
+        new KAlertDialog(context, KAlertDialog.ERROR_TYPE)
+                .setTitleText(getString(R.string.all_room))
+                .setContentText(getString(R.string.session_expired))
+                .setConfirmClickListener(new KAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(KAlertDialog sDialog) {
+                        sDialog.dismissWithAnimation();
+                        Intent loginIntent = new Intent(context, LoginActivity.class);
+                        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(loginIntent);
+                        finish();
+                    }
+                })
+                .show();
+
+
+    }
+
+    public void setFont(TextView tv)
+    {
+        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/Poppins-Light.ttf");
+        tv.setTypeface(face);
+    }
+
+
+
+}
